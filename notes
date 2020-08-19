@@ -1,3 +1,45 @@
+** Study points for the exam **
+
+Work with Red Hat OpenShift Container Platform
+    Create and work with multiple OpenShift projects
+    Implement application health monitoring
+
+Work with container images
+    Use command line utilities to manipulate container images
+    Optimize container images
+
+Troubleshoot application deployment issues
+    Diagnose and correct minor issues with application deployment
+
+Work with image streams
+    Create custom image streams to deploy applications
+    Pull applications from existing Git repositories
+    Debug minor issues with application deployment
+
+Work with configuration maps
+    Create configuration maps
+    Use configuration maps to inject data into applications
+
+Work with the source-to-image (S2I) tool
+    Deploy applications using S2I
+    Customize existing S2I builder images
+Work with hooks and triggers
+    Create a hook that runs a provided script
+    Test and confirm proper operation of the hook
+
+
+Work with templates
+    Use pre-existing templates written in either JSON or YAML format
+    Work with multicontainer templates
+    Add a custom parameter to a template
+
+
+
+
+
+
+
+-------------------------------------------------------
 Delete all resources in current project
     $ oc delete all --selector app=nbviewe
 
@@ -60,4 +102,13 @@ Deploy an application from the recently created image stream stored in another p
 Customize scripts of an existing s2i builder by creating wrapper scripts that invokes the default scripts, and then adds the necessary customization before or after the invocation. 
 To customize the S2I scripts for the rhscl/php-70-rhel7 S2I builder image, inspect the image to get the s2i builder scripts location, then create your own .s2i/bin/ scripts which points to the external scripts. 
     oc skopeo inspect docker://myregistry.example.com/rhscl/php-70-rhel7 -->> get the scripts from the base image       
+
+Use the s2i create command to create the template files required to create a new S2I builder image:
+    s2i create image_name directory
+
+After you update the Dockerfile and S2I scripts as needed, you can build the builder image using the podman build command.
+    sudo podman build -t builder_image .
+
+When the builder image is ready, you can build an application container image using the s2i build command. This allows you to test the S2I builder image locally, without the need to push it to a registry server and deploy an application using the builder image to an OpenShift cluster:
+    s2i build src-code builder_image tag_name
 
