@@ -1,0 +1,63 @@
+Delete all resources in current project
+    $ oc delete all --selector app=nbviewe
+
+
+*CHAPTER 3 DOCKERFILES*
+
+Change the group ID and permissions of the folders where the web server process reads and writes files:
+    RUN chgrp -R 0 /var/log/httpd /var/run/httpd && \
+        chmod -R g=u /var/log/httpd /var/run/httpd
+
+Add a USER instruction in Dockerfile for an unprivileged user. The Red Hat convention is to use userid 1001:
+    USER 1001
+
+*CHAPTER 4 Building Applications *
+
+Set up/access a generic webhook on a build config. A trigger can be accessed from the $oc describe bc/name. The describe command will list avaiable webhooks. A webhook is called via an URL that contains the WebHookSecret. 
+    oc describe bc/name --> http://<openshift_api_host:port>/oapi/v1/namespaces/<namespace>/buildconfigs/<name>/webhooks/<secret>/generic
+    oc get bc/name -o yaml ----> get secret for the webhook and paste in the secret into <secret> in above URL
+To invoke the webhook manually, the insecure -k flag is specified to ignore certificate validation.
+    curl -X POST -k https://<openshift_api_host:port>/oapi/v1/namespaces/<namespace>/buildconfigs/<name>/webhooks/<secret>/generic
+
+
+
+*CHAPTER 5 PUBLISHING IMAGES TO REGISTRIES & USING IMAGE STREAMS*
+
+Login to quay.io using Podman in order to let podman access token/authentication.
+    podman login quay.io
+
+Push an OCI image in from a local directory
+    Skopeo copy oci:Path/To/oci-image docker://quay.io/mille9393/nameOfImage:Tag
+
+Verify that Podman can run images from the external registry. Podman needs to run as root for this to work, so login as sudo
+    Sudo podman login quay.io
+    Sudo podman run --name <name> \
+    quay.io/username/image-name:1.0 
+
+Verify that the container is running and check it logs
+    sudo podman ps
+    sudo podman logs <container-id>
+
+OpenShift needs credentials in order to deploy the image from an external registry. Create a secret from the container registry API access token that was stored by Podman.    
+    oc create secret generic quayio \
+    --from-file .dockerconfigjson=run/user/1000/containers/auth.json \
+    --type kubernetes.io/dockerconfigjson
+
+Link secret quayio to OpenShifts default Service Account "default" in order to deploy the external image. 
+    oc secrets link default quayio --for pull
+
+import image and create image stream which points to the external image registry. Set the flags --confirm and --reference-policy=local so that other projects that use the image stream also can use the secret stored in the project where the secret was created. 
+    oc import-image php-info --confirm \
+    --reference-policy local \
+    --from quay.io/user_name/image_name    
+
+Deploy an application from the recently created image stream stored in another project. Grant access to the other project so that it can pull images from image streams from other projects.
+    oc add policy system:image-puller -n <project_where_imagestream_is> system:serviceaccount:<project_to_deploy_from>
+
+
+* Chapter 5 customizing s2i builds *
+
+Customize scripts of an existing s2i builder by creating wrapper scripts that invokes the default scripts, and then adds the necessary customization before or after the invocation. 
+To customize the S2I scripts for the rhscl/php-70-rhel7 S2I builder image, inspect the image to get the s2i builder scripts location, then create your own .s2i/bin/ scripts which points to the external scripts. 
+    oc skopeo inspect docker://myregistry.example.com/rhscl/php-70-rhel7 -->> get the scripts from the base image       
+
