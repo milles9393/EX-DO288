@@ -21,8 +21,16 @@ Work with configuration maps
     Use configuration maps to inject data into applications
 
 Work with the source-to-image (S2I) tool
-    Deploy applications using S2I
-    Customize existing S2I builder images
+    * Deploy applications using S2I
+    * Customize existing S2I builder images
+    * Create own S2I builder images
+        $s2i create <imageName> <destination>
+        s2i will create the necessary files, ie s2i/bin/* and directories with default values that needs to be configured.
+        Edit the Dockerfile that installs all of the necessary tools and libraries that are needed to build and run our application. 
+        This file will also handle copying the s2i scripts into the created image.
+        The Assembler script will 
+
+
 Work with hooks and triggers
     Create a hook that runs a provided script
     Test and confirm proper operation of the hook
@@ -32,9 +40,6 @@ Work with templates
     Use pre-existing templates written in either JSON or YAML format
     Work with multicontainer templates
     Add a custom parameter to a template
-
-
-
 
 
 
