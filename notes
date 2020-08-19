@@ -21,6 +21,8 @@ Work with configuration maps
     Use configuration maps to inject data into applications
 
 Work with the source-to-image (S2I) tool
+https://github.com/openshift/source-to-image/blob/master/examples/nginx-centos7/README.md
+https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
     * Deploy applications using S2I
     * Customize existing S2I builder images
     * Create own S2I builder images
