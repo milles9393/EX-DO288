@@ -30,7 +30,33 @@ https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
         s2i will create the necessary files, ie s2i/bin/* and directories with default values that needs to be configured.
         Edit the Dockerfile that installs all of the necessary tools and libraries that are needed to build and run our application. 
         This file will also handle copying the s2i scripts into the created image.
-        The Assembler script will 
+
+S2I chapter 5 final lab
+    * The S2I scripts for the builder image are provided in the /home/student/DO288/labs/custom-s2i/s2i/bin
+    * Edit the Dockerfile for the builder image to include an instruction to copy the S2I scripts to the appropriate location in the builder image. Add this new instruction immediately following the TODO comment already present in the file.
+        - steps 
+            add COPY ./s2i/bin/ /usr/libexec/s2i to Dockerfile
+    * Build the S2I builder image. Name the image s2i-do288-go.
+        - steps
+            Navigate to the directory where the Dockerfile which should be used for the builder image exists. THen build the builder image using podman.  
+            $ sudo podman build -t (tag name) 
+            $ sudo podman images
+    * Build the Dockerfile for an application container image that should combine the S2I builder image and the application source code locally in the /home/student/DO288/labs/custom-s2i/test/test-app directory.
+        - steps
+            Create a directory where the s2i command can save the Dockerfile which should combine the s2i builder image and the source code.
+            Use the s2i build command to produce a Dockerfile for the application container image:
+            $ s2i build <source code> <builder-image> [<tag>]
+            $ s2i build test/test-app/ \
+            > s2i-do288-go s2i-go-app \
+            > --as-dockerfile /home/student/s2i-go-app/Dockerfile
+    * Verify and test the S2I builder 
+        - steps
+            Test the application container image locally on the workstation VM. Run the container with the -u flag to simulate running as a random user on an OpenShift cluster. You can copy the command or run it directly from the ~/DO288/labs/custom-s2i/local-test.sh script:
+            $ sudo podman run --name go-test -u 1234 \
+            > -p 8080:8080 -d <ApplicationImageName>
+            $ curl http://localhost:8080/user1
+
+
 
 
 Work with hooks and triggers
