@@ -13,6 +13,9 @@ config_s2i
 echo "---> Installing application source AV MILLE AV MILLE AV MILLE AV MILLE AV MILLE"
 cp -Rf /tmp/src/*.html ./
 
+/usr/libexec/s2i/assemble
+rc=$?
+
 DATE=`date "+%b %d, %Y @ %H:%M %p"`
 
 echo "---> Creating info page AV MILLE AV MILLE AV MILLE AV MILLE AV MILLE AV MILLE AV MILLE"
